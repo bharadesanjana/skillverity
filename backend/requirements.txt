@@ -1,0 +1,14 @@
+fastapi
+uvicorn
+sqlalchemy
+alembic
+pydantic
+pydantic-settings
+faiss-cpu
+python-jose[cryptography]
+passlib[bcrypt]
+python-multipart
+httpx
+pytest
+numpy
+scikit-learn
