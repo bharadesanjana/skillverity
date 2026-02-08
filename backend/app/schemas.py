@@ -20,6 +20,9 @@ class Token(BaseModel):
     access_token: str
     token_type: str
 
+class TokenData(BaseModel):
+    email: Optional[str] = None
+
 # --- Quiz Schemas ---
 # Based on quiz.py usage
 class Question(BaseModel):
@@ -47,5 +50,28 @@ class QuizResponse(BaseModel):
     
     model_config = ConfigDict(from_attributes=True)
 
-# --- Roadmap Schemas (if referenced globally) ---
-# roadmap.py seems to define its own or use these if present
+# --- Roadmap AI Schemas ---
+class RoadmapWeek(BaseModel):
+    week: int
+    focus: str
+    topics: List[str]
+    practice: List[str]
+    outcome: str
+
+class RoadmapItemBase(BaseModel):
+    id: int
+    title: str
+    status: str
+    model_config = ConfigDict(from_attributes=True)
+
+class RoadmapCreate(BaseModel):
+    role_title: str
+    duration_weeks: int = 6
+
+class RoadmapResponse(BaseModel):
+    id: int
+    role_title: str
+    content: dict
+    status: str
+    items: List[RoadmapItemBase] = []
+    model_config = ConfigDict(from_attributes=True)

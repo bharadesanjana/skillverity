@@ -55,7 +55,7 @@ export default function LoginPage() {
             }
 
             console.log("[Login] Success, received token")
-            localStorage.setItem("token", data.access_token)
+            localStorage.setItem("access_token", data.access_token)
             router.push("/dashboard")
 
         } catch (err: any) {

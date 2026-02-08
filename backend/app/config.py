@@ -7,7 +7,8 @@ class Settings(BaseSettings):
     SECRET_KEY: str = "CHANGE_THIS_IN_PRODUCTION_SECRET"
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
-    GEMINI_API_KEY: str = None
+    GEMINI_API_KEY: str | None = None
+    MONGODB_URL: str | None = None
 
     class Config:
         case_sensitive = True

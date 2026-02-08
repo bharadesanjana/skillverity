@@ -10,7 +10,8 @@ export async function apiRequest(endpoint: string, options: RequestOptions = {})
     const { method = "GET", headers = {}, body } = options;
 
     // 1. Auto-inject token if user is logged in
-    const token = typeof window !== 'undefined' ? localStorage.getItem("token") : null;
+    const token = typeof window !== 'undefined' ? localStorage.getItem("access_token") : null;
+    console.log("JWT TOKEN:", token);
     const authHeaders: Record<string, string> = token
         ? { "Authorization": `Bearer ${token}` }
         : {};
@@ -38,7 +39,7 @@ export async function apiRequest(endpoint: string, options: RequestOptions = {})
         if (response.status === 401) {
             if (typeof window !== 'undefined') {
                 console.warn("[API] 401 Unauthorized - Redirecting to login");
-                localStorage.removeItem("token");
+                localStorage.removeItem("access_token");
                 window.location.href = "/login";
                 return; // Stop execution
             }

@@ -31,6 +31,7 @@ const PREDEFINED_ROLES = [
 
 export function DashboardRoleSelector({ onRoadmapCreated }: { onRoadmapCreated: () => void }) {
     const [loadingRole, setLoadingRole] = useState<string | null>(null)
+    const [duration, setDuration] = useState<number>(6)
     const router = useRouter()
 
     const handleSelectRole = async (role: string) => {
@@ -38,13 +39,16 @@ export function DashboardRoleSelector({ onRoadmapCreated }: { onRoadmapCreated: 
         try {
             await apiRequest("/roadmaps/", {
                 method: "POST",
-                body: { role_title: role }
+                body: {
+                    role_title: role,
+                    duration_weeks: duration
+                }
             })
             onRoadmapCreated()
             // Optional: navigate to specific roadmap or just reload dashboard state
-        } catch (error) {
+        } catch (error: any) {
             console.error(error)
-            alert("Failed to generate roadmap. Please try again.")
+            alert(`Failed to generate roadmap: ${error.message || "Unknown error"}`)
         } finally {
             setLoadingRole(null)
         }
@@ -54,17 +58,34 @@ export function DashboardRoleSelector({ onRoadmapCreated }: { onRoadmapCreated: 
         <section>
             <div className="text-center mb-10">
                 <h2 className="text-3xl font-bold tracking-tight mb-2">Choose Your Career Path</h2>
-                <p className="text-muted-foreground max-w-2xl mx-auto">
+                <p className="text-muted-foreground max-w-2xl mx-auto mb-6">
                     Select a role to instantly generate a personalized, AI-powered learning roadmap.
                     Start your journey to becoming a professional.
                 </p>
+
+                <div className="flex flex-col items-center gap-3">
+                    <span className="text-sm font-medium text-muted-foreground">Select Duration:</span>
+                    <div className="flex flex-wrap justify-center gap-2">
+                        {[1, 2, 3, 4, 6].map((w) => (
+                            <Button
+                                key={w}
+                                variant={duration === w ? "default" : "outline"}
+                                onClick={() => setDuration(w)}
+                                size="sm"
+                                disabled={!!loadingRole}
+                            >
+                                {w} Weeks
+                            </Button>
+                        ))}
+                    </div>
+                </div>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                 {PREDEFINED_ROLES.map((role) => (
                     <Card
                         key={role.title}
-                        className={`cursor-pointer transition-all hover:scale-105 hover:border-primary/50 ${loadingRole === role.title ? 'ring-2 ring-primary animate-pulse' : ''}`}
+                        className={`cursor-pointer transition-all hover:scale-105 hover:border-primary/50 bg-card ${loadingRole === role.title ? 'ring-2 ring-primary animate-pulse' : ''}`}
                         onClick={() => !loadingRole && handleSelectRole(role.title)}
                     >
                         <CardHeader>
@@ -72,11 +93,13 @@ export function DashboardRoleSelector({ onRoadmapCreated }: { onRoadmapCreated: 
                             <CardDescription>{role.desc}</CardDescription>
                         </CardHeader>
                         <CardContent>
-                            {loadingRole === role.title ? (
-                                <Button className="w-full" disabled>Generating...</Button>
-                            ) : (
-                                <Button className="w-full" variant="secondary">Select Path</Button>
-                            )}
+                            <Button
+                                className="w-full"
+                                variant={loadingRole === role.title ? "default" : "secondary"}
+                                disabled={!!loadingRole}
+                            >
+                                {loadingRole === role.title ? "Generating AI Plan..." : `Generte ${duration}-Week Plan`}
+                            </Button>
                         </CardContent>
                     </Card>
                 ))}

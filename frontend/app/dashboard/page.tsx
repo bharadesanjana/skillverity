@@ -26,7 +26,7 @@ export default function DashboardPage() {
 
     const loadDashboard = async () => {
         try {
-            const token = localStorage.getItem("token")
+            const token = localStorage.getItem("access_token")
             if (!token) {
                 router.push("/login")
                 return
@@ -73,7 +73,7 @@ export default function DashboardPage() {
                 <div className="ml-auto flex gap-4">
                     {roadmaps.length > 0 && <Button variant="ghost" onClick={() => setRoadmaps([])}>Browse Roles</Button>}
                     <Button variant="outline" onClick={() => {
-                        localStorage.removeItem("token")
+                        localStorage.removeItem("access_token")
                         router.push("/login")
                     }}>Logout</Button>
                 </div>

@@ -5,6 +5,7 @@ import random
 
 from app import models, schemas, deps
 from app.database import get_db
+from app.services import ai_roadmap
 
 router = APIRouter()
 
@@ -27,31 +28,48 @@ def generate_quiz(
     if roadmap_item.quiz:
         return roadmap_item.quiz
 
-    # Dummy Question Generation (In real app, this comes from AI/VectorStore)
-    questions = [
-        {
-            "id": 1,
-            "text": "What is the capital of Python?",
-            "options": ["Snake City", "Guido's House", "None (It's a language)", "C++"],
-            "correct_option": 2
-        },
-        {
-            "id": 2,
-            "text": "Which method is used to add an item to a list?",
-            "options": [".push()", ".add()", ".append()", ".insert()"],
-            "correct_option": 2
-        },
-        {
-             "id": 3,
-            "text": "What is 2 + 2 in Python?",
-            "options": ["4", "22", "Error", "None"],
-            "correct_option": 0
-        }
-    ]
+    # Text Parsing to extract Context
+    # Title format: "Week {num}: {focus}" or "Final Assessment"
+    import re
+    week_number = 1
+    focus = roadmap_item.title
+    role_title = roadmap_item.roadmap.role_title
+    
+    match = re.search(r"Week (\d+): (.*)", roadmap_item.title)
+    if match:
+        week_number = int(match.group(1))
+        focus = match.group(2)
+    elif roadmap_item.title == "Final Assessment":
+        week_number = 99 # Special case
+        focus = "Final Assessment"
+
+    # Description format: "Topics: ...\nTasks: ...\nOutcome: ..."
+    topics = "General"
+    tasks = "General"
+    
+    desc_lines = roadmap_item.description.split('\n')
+    for line in desc_lines:
+        if line.startswith("Topics:"):
+            topics = line.replace("Topics:", "").strip()
+        elif line.startswith("Tasks:") or line.startswith("Practice:"):
+            tasks = line.replace("Tasks:", "").replace("Practice:", "").strip()
+
+    # Call New AI Service
+    questions_data = ai_roadmap.generate_weekly_quiz(
+        role=role_title,
+        week_number=week_number,
+        focus=focus,
+        topics=topics,
+        tasks=tasks
+    )
+    
+    # Assign IDs manually to ensure they are 1-N
+    for i, q in enumerate(questions_data):
+        q["id"] = i + 1
     
     db_quiz = models.Quiz(
         roadmap_item_id=roadmap_item_id,
-        questions=questions,
+        questions=questions_data,
         score=None,
         passed=False,
         attempts=0
