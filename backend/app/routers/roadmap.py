@@ -66,10 +66,13 @@ def create_roadmap(
         db.refresh(db_roadmap)
 
         # 4. Flatten Weeks into RoadmapItems for SQL tracking
-        weeks = ai_data.get("roadmap", [])
+        # New structure uses "weeks" instead of "roadmap"
+        weeks = ai_data.get("weeks") or ai_data.get("roadmap", [])
+        
         for week_data in weeks:
             week_num = week_data.get("week")
-            focus = week_data.get("focus")
+            # "title" is the new field, "focus" is legacy
+            title = week_data.get("title") or week_data.get("focus")
             
             # Helper to safely join lists
             def safe_join(lst):
@@ -77,17 +80,34 @@ def create_roadmap(
                     return ", ".join(lst)
                 return str(lst) if lst else ""
 
-            topics = safe_join(week_data.get("topics"))
-            # 'tasks' is the new field, 'practice' is legacy. Support both.
-            tasks_list = week_data.get("tasks") or week_data.get("practice")
-            tasks = safe_join(tasks_list)
+            # "skills" is the new field, "topics" is legacy
+            skills_list = week_data.get("skills") or week_data.get("topics")
+            topics = safe_join(skills_list)
+            
+            # 'tasks' is now a list of objects, but legacy might be strings
+            tasks_data = week_data.get("tasks") or week_data.get("practice")
+            tasks_str = ""
+            
+            if tasks_data and isinstance(tasks_data, list):
+                # Check if it's a list of dicts (new format) or strings (legacy)
+                if tasks_data and isinstance(tasks_data[0], dict):
+                    # Format tasks nicely
+                    formatted_tasks = []
+                    for t in tasks_data:
+                        t_desc = t.get("task", "")
+                        t_diff = t.get("difficulty", "")
+                        formatted_tasks.append(f"- {t_desc} [{t_diff}]")
+                    tasks_str = "\n".join(formatted_tasks)
+                else:
+                    tasks_str = safe_join(tasks_data)
+            
             outcome = week_data.get("outcome") or ""
             
-            description = f"Topics: {topics}\nTasks: {tasks}\nOutcome: {outcome}"
+            description = f"Skills: {topics}\n\nTasks:\n{tasks_str}\n\nOutcome: {outcome}"
             
             db_item = models.RoadmapItem(
                 roadmap_id=db_roadmap.id,
-                title=f"Week {week_num}: {focus}",
+                title=f"Week {week_num}: {title}",
                 description=description,
                 resource_url="", 
                 status="pending"

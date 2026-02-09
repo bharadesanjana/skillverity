@@ -75,3 +75,41 @@ class RoadmapResponse(BaseModel):
     status: str
     items: List[RoadmapItemBase] = []
     model_config = ConfigDict(from_attributes=True)
+
+# --- Verification Schemas ---
+class VerificationGenerateRequest(BaseModel):
+    role: str
+    week: int
+    title: str = ""
+    skills: List[str]
+    tasks: List[str] 
+
+class VerificationQuestion(BaseModel):
+    id: int
+    type: str
+    question: str
+    expected_skills_tested: List[str]
+    evaluation_criteria: List[str]
+
+class VerificationResponse(BaseModel):
+    week: int
+    assessment_type: str
+    questions: List[VerificationQuestion]
+
+class EvaluationRequest(BaseModel):
+    role: str
+    week: int
+    skill_focus: str
+    question: str
+    answer: str
+
+class EvaluationResponse(BaseModel):
+    score: int
+    level: str
+    strengths: List[str]
+    weaknesses: List[str]
+    verdict: str
+    feedback: str
+
+class FollowupRequest(BaseModel):
+    summary: str

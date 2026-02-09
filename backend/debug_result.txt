@@ -1,0 +1,6 @@
+API Key present: True
+Testing generate_verification_assessment...
+Assessment failed with error: 404 models/gemini-1.5-flash is not found for API version v1beta, or is not supported for generateContent. Call ListModels to see the list of available models and their supported methods.
+
+Testing evaluate_response...
+Evaluation result: {'score': 50, 'level': 'Beginner', 'strengths': ['Answer provided'], 'weaknesses': ['Could not evaluate (API Error)'], 'verdict': 'Borderline', 'feedback': 'System is currently offline, please try again.'}

@@ -35,9 +35,12 @@ def run_verification():
 
     # 3. Check Structure (Tasks field)
     content = roadmap["content"]
-    weeks = content.get("roadmap", [])
-    if weeks and ("tasks" in weeks[0] or "practice" in weeks[0]):
-        print(f"✅ Roadmap has tasks/practice: {weeks[0].get('tasks')}")
+    weeks = content.get("weeks", [])
+    if weeks and ("tasks" in weeks[0]):
+        tasks = weeks[0].get('tasks')
+        print(f"✅ Roadmap has tasks: {len(tasks)} tasks found.")
+        if len(tasks) > 0 and isinstance(tasks[0], dict):
+             print(f"   Task 1: {tasks[0].get('task')} (Diff: {tasks[0].get('difficulty')})")
     else:
         print("❌ 'tasks' field missing in JSON content.")
 

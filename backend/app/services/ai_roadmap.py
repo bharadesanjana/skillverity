@@ -65,36 +65,39 @@ def generate_roadmap_content(role: str, duration_weeks: int = 6) -> Dict[str, An
     You are a senior curriculum architect, technical interviewer, and certification designer.
 
     GOAL:
-    Design a job-seeking-ready learning and evaluation system for a specific role.
+    Design a job-seeking-ready 4-WEEK learning and evaluation system for a specific role.
     The output must be rigorous, practical, and industry-aligned.
-
+    
     ROLE:
     {role}
 
     DURATION:
-    {duration_weeks} weeks
+    4 weeks (Strict)
 
     SYSTEM REQUIREMENTS:
 
     1. WEEKLY ROADMAP (HIGH QUALITY)
-    - Each week must focus on job-relevant skills only.
+    - 4 Weeks total.
+    - Each week must focus on 3-5 REAL skills (no fluff).
     - Avoid generic theory.
     - Emphasize hands-on tasks, real-world scenarios, and interview relevance.
 
-    2. WEEKLY TASKS + WEEKLY QUIZ
-    For EACH week:
-    - Provide practical tasks (coding, building, analyzing).
+    2. WEEKLY TASKS (HANDS-ON)
+    - For EACH week, provide 3 practical tasks.
+    - Tasks must simulate real-world work (not tutorials).
+    - No "Watch a video" or "Read a blog".
+    - Tasks must require thinking and building.
+    - At least one debugging or refactoring task per week.
+
+    3. WEEKLY QUIZ
     - Provide a WEEKLY QUIZ with 5 questions.
-    - Questions MUST be strictly related to that week's topics.
+    - Questions MUST be strictly related to that week's skills.
     - Difficulty: Medium to Hard.
 
-    3. FINAL ASSESSMENT (MANDATORY)
-    - Generate ONE FINAL TEST that covers all weeks.
+    4. FINAL ASSESSMENT (MANDATORY)
+    - Generate ONE FINAL TEST that covers all 4 weeks.
     - 10 Questions total.
     - Difficulty: HARD.
-
-    4. BADGE & EVALUATION SYSTEM
-    - Define output for Beginner, Intermediate, Expert levels.
 
     STRICT OUTPUT RULES:
     - Output ONLY valid JSON.
@@ -105,13 +108,25 @@ def generate_roadmap_content(role: str, duration_weeks: int = 6) -> Dict[str, An
 
     {{
       "role": "{role}",
-      "duration_weeks": {duration_weeks},
-      "roadmap": [
+      "duration_weeks": 4,
+      "weeks": [
         {{
           "week": 1,
-          "focus": "string",
-          "topics": ["string"],
-          "tasks": ["string"],
+          "title": "Week Title (e.g., Foundations of Component Architecture)",
+          "skills": ["Skill A", "Skill B", "Skill C"],
+          "tasks": [
+            {{
+                "task": "Task description...",
+                "difficulty": "Easy",
+                "expected_output": "Output description..."
+            }},
+            {{
+                "task": "Task description...",
+                "difficulty": "Medium",
+                "expected_output": "Output description..."
+            }}
+          ],
+          "outcome": "Learning outcome...",
           "weekly_quiz": [
             {{
               "id": 1,
@@ -136,20 +151,6 @@ def generate_roadmap_content(role: str, duration_weeks: int = 6) -> Dict[str, An
               "correct_option": 0
             }}
         ]
-      }},
-      "evaluation_levels": {{
-        "beginner": "0-49%",
-        "intermediate": "50-79%",
-        "expert": "80-100%"
-      }},
-      "badges": {{
-        "beginner": "Learning in Progress",
-        "intermediate": "Skill-Qualified",
-        "expert": "Skill-Verified"
-      }},
-      "improvement_guidance": {{
-        "beginner": ["Daily practice", "Revisit basics"],
-        "intermediate": ["Build complex projects", "Contribute to open source"]
       }}
     }}
     
@@ -170,12 +171,24 @@ def get_fallback_data(role: str, duration_weeks: int = 6):
     print(f"DEBUG: Using fallback data for {role} ({duration_weeks} weeks)")
     
     weeks = []
-    for i in range(1, duration_weeks + 1):
+    for i in range(1, 5): # Verify strict 4 weeks
         weeks.append({
             "week": i,
-            "focus": f"Week {i} Core Skills",
-            "topics": ["Topic A", "Topic B", "Topic C"],
-            "tasks": ["Build a small project", "Solve 5 LeetCode problems"],
+            "title": f"Week {i}: Core Proficiency",
+            "skills": ["Skill A", "Skill B", "Skill C"],
+            "tasks": [
+                {
+                    "task": "Build a component library",
+                    "difficulty": "Medium",
+                    "expected_output": "Five reusable components"
+                },
+                {
+                    "task": "Refactor legacy code",
+                    "difficulty": "Hard",
+                    "expected_output": "Clean, typed code"
+                }
+            ],
+            "outcome": "Proficiency in core skills",
             "weekly_quiz": [
                 {
                     "id": 1,
@@ -222,26 +235,12 @@ def get_fallback_data(role: str, duration_weeks: int = 6):
 
     return {
         "role": role,
-        "duration_weeks": duration_weeks,
-        "roadmap": weeks,
+        "duration_weeks": 4,
+        "weeks": weeks,
         "final_assessment": {
             "total_questions": 10,
             "difficulty": "hard",
             "questions": []
-        },
-        "evaluation_levels": {
-            "beginner": "0-49%",
-            "intermediate": "50-79%",
-            "expert": "80-100%"
-        },
-        "badges": {
-            "beginner": "Learning in Progress",
-            "intermediate": "Skill-Qualified",
-            "expert": "Skill-Verified"
-        },
-        "improvement_guidance": {
-            "beginner": ["Practice more"],
-            "intermediate": ["Build more"]
         }
     }
 

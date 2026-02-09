@@ -31,6 +31,9 @@ app.include_router(quiz.router, prefix="/quizzes", tags=["quizzes"])
 app.include_router(certification.router, prefix="/certification", tags=["certification"])
 app.include_router(dashboard.router, prefix="/dashboard", tags=["dashboard"])
 
+from app.routers import verification
+app.include_router(verification.router, prefix="/verification", tags=["verification"])
+
 @app.get("/")
 def read_root():
     return {"message": "SkillVerity API Running"}
